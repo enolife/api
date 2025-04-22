@@ -10,11 +10,11 @@ function fetchJSONWithDelay(url, delay) {
                     return response.json();
                 })
                 .then(data => {
-                    console.log(`Fetched JSON after ${delay/1000} seconds:`, data);
+                    console.log(`Fetched JSON after ${delay/1000} seconds from ${url}:`, data);
                     resolve(data);
                 })
                 .catch(error => {
-                    console.error(`Error fetching JSON after ${delay/1000} seconds:`, error);
+                    console.error(`Error fetching JSON after ${delay/1000} seconds from ${url}:`, error);
                     reject(error);
                 });
         }, delay);
@@ -23,7 +23,7 @@ function fetchJSONWithDelay(url, delay) {
 
 // Main function to load JSON twice with 8-second delays
 async function loadJSONTwice() {
-    const jsonUrl = "user-base-detail.json"; // Relative path, assumes same directory
+    const jsonUrl = "json"; // Relative path to /api/json
     const delay = 8000; // 8 seconds in milliseconds
 
     try {
