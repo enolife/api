@@ -1,27 +1,48 @@
-// Function to generate a random userId (e.g., 8-digit number as a string)
-function generateRandomUserId() {
-    return Math.floor(10000000 + Math.random() * 90000000).toString();
+// Function to fetch JSON with a delay
+function fetchJSONWithDelay(url, delay) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(`Fetched JSON after ${delay/1000} seconds:`, data);
+                    resolve(data);
+                })
+                .catch(error => {
+                    console.error(`Error fetching JSON after ${delay/1000} seconds:`, error);
+                    reject(error);
+                });
+        }, delay);
+    });
 }
 
-// Fetch the static JSON file
-fetch('./user-base-detail.json')
-    .then(response => response.json())
-    .then(data => {
-        // Replace the placeholder userId with a random one
-        data.data.userId = generateRandomUserId();
+// Main function to load JSON twice with 8-second delays
+async function loadJSONTwice() {
+    const jsonUrl = "user-base-detail.json"; // Relative path, assumes same directory
+    const delay = 8000; // 8 seconds in milliseconds
 
-        // Set the response headers to mimic JSON API
-        const jsonString = JSON.stringify(data);
-        const blob = new Blob([jsonString], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
+    try {
+        // First fetch after 8 seconds
+        console.log("Starting first JSON fetch...");
+        const firstResult = await fetchJSONWithDelay(jsonUrl, delay);
+        console.log("First fetch completed:", firstResult);
 
-        // Output the JSON (for testing in browser)
-        document.body.innerText = jsonString;
+        // Second fetch after another 8 seconds (16 seconds total from start)
+        console.log("Starting second JSON fetch...");
+        const secondResult = await fetchJSONWithDelay(jsonUrl, delay);
+        console.log("Second fetch completed:", secondResult);
+    } catch (error) {
+        console.error("Failed to load JSON:", error);
+    }
+}
 
-        // Optionally, you can redirect or handle the response differently
-        // For example, console.log(data) for debugging
-    })
-    .catch(error => {
-        console.error('Error fetching JSON:', error);
-        document.body.innerText = JSON.stringify({ error: 'Failed to load JSON' });
-    });
+// Run the function when the page loads
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("Page loaded, initiating JSON fetches...");
+    loadJSONTwice();
+});
